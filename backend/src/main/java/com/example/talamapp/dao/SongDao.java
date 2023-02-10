@@ -21,8 +21,8 @@ public class SongDao
     @Column(name = "description")
     private String description;
 
-    @Column(nullable = false, name = "notes_path")
-    private String notesPath;
+    @Column(nullable = false, name = "notes")
+    private String notes;
 
     @Column(name = "talam_id")
     private Long talamId;
@@ -63,12 +63,12 @@ public class SongDao
         this.description = description;
     }
 
-    public String getNotesPath() {
-        return this.notesPath;
+    public String getNotes() {
+        return this.notes;
     }
 
-    public void setNotesPath(String notesPath) {
-        this.notesPath = notesPath;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public TalamDao getTalamDao() {

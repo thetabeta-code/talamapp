@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Talam editor</title>
+        <title>Ragam editor</title>
         <link href="css/styles.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
         <style>
@@ -24,7 +24,7 @@
                 background-repeat: no-repeat;
             }
 
-            #talam{
+            #ragam{
                 color:aliceblue;
             }
             label{
@@ -41,18 +41,6 @@
             }
             #top-menu-bar{
                 background-color: rgb(188, 80, 80);
-            }
-            .laghu{
-                background-color: rgb(13, 110, 253);
-                border-radius: 20px;
-            }
-            .drutam{
-                background-color: rgb(253, 126, 20);
-                border-radius: 20px;
-            }
-            .anudrutam{
-                background-color: rgb(6, 184, 109);
-                border-radius: 20px;
             }
         </style>
     </head>
@@ -85,9 +73,9 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Search song
                             </a>
-                            <a class="nav-link" href="Talam-search.html">
+                            <a class="nav-link" href="ragam-search.html">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                                Search talam
+                                Search Talam
                             </a>
                             <a class="nav-link" href="Ragam-search.html">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
@@ -103,15 +91,33 @@
             </div>
             <div id="layoutSidenav_content">
                 <main>
-                    <div>
-                        <div class = "container mx-auto p-3">
-                            <h1 id = "talam-name" class = "lead mx-auto"></h1>
-                            <div class = "p-2 border border-light" id = "talam">
-                                Enter some angaas!
+                    <div class="container">
+                        <form method = "post">
+                            <div class="row mx-auto py-3">
+                                <div class = "col-12">
+                                    <h1 class = "lead mx-auto">Ragam name</h1>
+                                    <div>
+                                        <input class = mx-auto type="text" name="name-of-ragam" id="ragam-name" required>
+                                        <p class="hidden error" id="name-error">A ragam with this name exists</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
+                           
+                            <div class = "row mx-auto py-3">
+                                <h1 class = "lead mx-auto">Ragam creator</h1>
                                 
+                                <div>
+                                    <h3 class="lead mx-auto">Arohana</h3>
+                                    <input style="display:block" type="text" name="arohana" id="arohana" required>
+                                    <h3 class="lead mx-auto pt-2">Avarohana</h3>
+                                    <input style="display:block" type="text" name="avarohana" id="avarohana" required>
+                                    <p class="hidden error" id="arohana-avarohana-error">A ragam with the same arohana and avarohana exists</p>
+                                </div>
+
+                                <center><input class = "col-2 offset-md-4 mt-3 mx-2 btn btn-outline-light btn-lg" type="submit" name="cancel" value = "Discard" id="cancel">
+                                <input class = "col-2 mt-3 mx-2 btn btn-primary btn-lg" type="submit" name="save&exit" value = "Save" id="save-and-exit"></center>
                             </div>
+                        </form>
                     </div>
                 </main>
             </div>
@@ -121,45 +127,68 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
         <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js'></script>
         <script>
+
             $(document).ready(function(){
-                console.log(localStorage.getItem('talamId'));
-                var talamSentence;
-                $("#talam").text("");
-                var talamId = parseInt(JSON.parse((localStorage.getItem("talamId"))));
+                var names;
+                var arohanas;
+                var avarohanas;
+                var ragamName;
+                var arohana;
+                var avarohana;
                 $.ajax({
                         type: `GET`,
-                        url: `${BACKEND_URL}talamSearches/${talamId}`,
-                        async: false,
-                        success: function(talamSearch){
-                            console.log(talamSearch);
-                            talamSentence = talamSearch.angaas;
-                            talamName = talamSearch.name;
+                        url: `${BACKEND_URL}ragams`,
+                        success: function(ragams){
+                            names = ragams.map(ragam => ragam.name);
+                            arohanas = ragams.map(ragam => ragam.arohana);
+                            avarohanas = ragams.map(ragam => ragam.avarohana);
                         }
-                })
-                $("#talam-name").text(talamName);
-                var talamSplit = talamSentence.split(" ");
-                var newTalam = "";
-                for(var i = 0; i < (talamSplit.length); i++){
-                    var talamSpan = $(("<span>"));
-                    talamSpan.text(talamSplit[i]);
-                    
-                    if(talamSplit[i] == "Laghu(3)"){
-                        talamSpan.attr({class: "laghu px-2 py-1 m-1"});
-                    } else if(talamSplit[i] == "Laghu(4)"){
-                        talamSpan.attr({class: "laghu px-2 py-1 m-1"});
-                    } else if(talamSplit[i] == "Laghu(5)"){
-                        talamSpan.attr({class: "laghu px-2 py-1 m-1"});
-                    } else if(talamSplit[i] == "Drutam"){
-                        talamSpan.attr({class: "drutam px-2 py-1 m-1"});
-                    } else if(talamSplit[i] == "Anudrutam"){
-                        talamSpan.attr({class: "anudrutam px-2 py-1 m-1"});
+                    })
+                $("form").submit(function(event){
+                    event.preventDefault();
+                    ragamName = $("#ragam-name").val();
+                    arohana = $("#arohana").val();
+                    avarohana = $("#avarohana").val();
+                    console.log(ragamName);
+
+                    if (names.includes(ragamName) || (arohanas.includes(arohana) && avarohanas.includes(avarohana))){
+                        $("#name-error").addClass("hidden");
+                        $("#arohana-avarohana-error").addClass("hidden");
+
+                        console.log(names);
+                        console.log(names.includes(ragamName));
+
+                        if (names.includes(ragamName)){
+                            $("#name-error").removeClass("hidden");
+                            console.log("show name error");
+                        }
+                        if (arohanas.includes(arohana) && avarohanas.includes(avarohana)){
+                            $("#arohana-avarohana-error").removeClass("hidden");
+                            console.log("show arohana-avarohana error");
+                        }
+                    } else {
+                        $("#name-error").addClass("hidden");
+                        $("#arohana-avarohana-error").addClass("hidden");
+    
+                        var ragam = {
+                            name: ragamName,
+                            arohana: arohana,
+                            avarohana: avarohana
+                        }
+    
+                        console.log(ragam);
+    
+                        $.ajax({
+                            type: "POST",
+                            url: `${BACKEND_URL}ragams`,
+                            data: JSON.stringify(ragam),
+                            contentType: `application/json`,
+                            success: function(){
+                                console.log("success!");
+                            }
+                        })
                     }
-                    
-                    talamSpan.attr({style: "display: inline-block"})
-                    talamSpan.text(talamSplit[i] + " ");
-                    console.log("hello");
-                    $("#talam").append(talamSpan);
-                }
+                })
             })
         </script>
     </body>

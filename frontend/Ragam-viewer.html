@@ -6,22 +6,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Ragam search</title>
+        <title>Song editor</title>
         <link href="css/styles.css" rel="stylesheet" />
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-        
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
         <style>
             body{
                 background-image: url("Background-Image-copy.png");
-                background-color: rgb(203, 60, 60);
+                background-color: rgb(189, 78, 78);
                 background-size: 100% 100%;
                 background-repeat: no-repeat;
+                overflow: visible;
             }
 
-            #talam{
-                color:aliceblue;
-            }
             label{
                 color: aliceblue;
             }
@@ -37,9 +33,40 @@
             #top-menu-bar{
                 background-color: rgb(188, 80, 80);
             }
-
-            .dataTables_empty{
-                display: none;
+            #song-name-set{
+                width: 35%;
+            }
+            #song-name{
+                width: 100%;
+            }
+            #ragam-set{
+                width: 25%;
+            }
+            #talam-set{
+                width: 30%;
+            }
+            #ragams{
+                width: 100%;
+            }
+            #talams{
+                width: 100%;
+            }
+            .small-heading{
+            font-weight: 300;
+            }
+            #description-div{
+                width: 60%;
+            }
+            #description{
+                width: 100%;
+                resize: none;
+            }
+            #notes-div{
+                width: 60%;
+            }
+            #notes{
+                width: 100%;
+                resize: none;
             }
         </style>
     </head>
@@ -90,24 +117,20 @@
             </div>
             <div id="layoutSidenav_content">
                 <main>
-                    <div class = "container mx-auto p-3">
-                        <h1 id = "talam-name" class = "lead mx-auto">Search for a ragam</h1>
-                        <div class="pb-3 row">
-                            <div class="col-3">
-                                <a href="Ragam-creator - Grid system.html"><button class="mx-auto btn btn-light">+Add a new ragam</button></a>
+                    <div class="container">
+                        <div class = "row mx-auto py-3">
+                            <div class = "col-4">
+                                <h1 class = "lead text-light mx-auto">Ragam</h1>
+                                <p id="ragam-name" class="text-light"></p>
                             </div>
                         </div>
-                        <div style="width: 100%;" class="card">
-                            <table id="datatable">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Arohana</th>
-                                        <th>Avarohana</th>
-                                    </tr>
-                                </thead>
-                            </table>
+                        <div class = "row mx-auto">
+                            <div class="col-8">
+                                <h6 class="lead text-light">Arohana</h6>
+                                <p id="arohana" class="text-light"></p>
+                                <h6 class="lead text-light">Avarohana</h6>
+                                <p id="avarohana" class="text-light"></p>
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -116,40 +139,34 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="js/scripts.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-        <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+        <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js'></script>
         <script>
+            
             $(document).ready(function(){
-                $('#datatable').DataTable({
-                ajax: {
-                    url: BACKEND_URL + 'ragams',
-                    dataSrc: ''
-                },
-                columns: [
-                    { data: 'id' },
-                    { data: 'name' },
-                    { data: 'arohana' },
-                    { data: 'avarohana' }
-                ],
-                columnDefs: [
-                    {
-                        "targets": 0,
-                        "render": function (data, type, row, meta){
-                            return `<a class="link" href="Ragam-viewer.html">${data}</a>`;
+
+                var ragamId = parseInt(JSON.parse((localStorage.getItem("ragamId"))));
+
+                var ragamName;
+                var arohana;
+                var avarohana;
+
+                $.ajax({
+                        type: `GET`,
+                        url: `${BACKEND_URL}ragams/${ragamId}`,
+                        async: false,
+                        success: function(ragam){
+                            console.log(ragam);
+                            ragamName = ragam.name;
+                            arohana = ragam.arohana;
+                            avarohana = ragam.avarohana;
                         }
-                    }
-                ],
-                createdRow: function(row, data, dataIndex){
-                    
-                    console.log('Data', data);
-                    console.log(data.id);
-                    console.log('Row', row);
-                    $(row).find(".link").on("click", function(){
-                        localStorage.setItem("ragamId", JSON.stringify(data.id));
-                    })
-                }
+                });
+
+                $("#ragam-name").text(ragamName);
+                console.log(avarohana);
+                $("#avarohana").text(avarohana);
+                $("#arohana").text(arohana);
             });
-            })
         </script>
     </body>
 </html>

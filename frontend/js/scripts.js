@@ -7,6 +7,10 @@
 // Scripts
 // 
 
+const BACKEND_URL = "http://localhost:8080/api/";
+
+//const BACKEND_URL = "/api/";
+
 window.addEventListener('DOMContentLoaded', event => {
 
     // Toggle the side navigation

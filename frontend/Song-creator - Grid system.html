@@ -80,7 +80,7 @@
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark shadow" id = "top-menu-bar">
             <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="index.html">Talam App</a>
+            <a class="navbar-brand ps-3" href="Song-search.html">Talam App</a>
             <!-- Sidebar Toggle-->
             <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
             <!-- Navbar Search-->
@@ -102,15 +102,15 @@
                 <nav class="sb-sidenav accordion sb-sidenav-dark shadow-sm" id="sidenavAccordion">
                     <div class="sb-sidenav-menu shadow">
                         <div class="nav">
-                            <a class="nav-link" href="index.html">
+                            <a class="nav-link" href="Song-search.html">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                                Home
+                                Search song
                             </a>
-                            <a class="nav-link" href="index.html">
+                            <a class="nav-link" href="Talam-search.html">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Search talam
                             </a>
-                            <a class="nav-link" href="index.html">
+                            <a class="nav-link" href="Ragam-search.html">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Search Ragam
                             </a>
@@ -129,17 +129,17 @@
                             <div class = "row mx-auto py-3">
                                 <div class = "col-4">
                                     <h1 class = "lead text-light mx-auto">Song name</h1>
-                                    <input class = "mx-auto mt-1" type="text" name="name-of-song" id="song-name">
+                                    <input class = "mx-auto mt-1" type="text" name="name-of-song" id="song-name" required>
                                 </div>
                                 <div class = "col-4">
                                     <h1 class = "lead text-light mx-auto">Ragam</h1>
-                                    <select class = "form-select mt-1" name="ragams" id="ragams">
+                                    <select class = "form-select mt-1" name="ragams" id="ragams" required>
                                         
                                     </select>
                                 </div>
                                 <div class = "col-4">
                                     <h1 class = "lead text-light mx-auto">Talam</h1>
-                                    <select class = "form-select mt-1" name="talams" id="talams">
+                                    <select class = "form-select mt-1" name="talams" id="talams" required>
                                         
                                     </select>
                                 </div>
@@ -151,11 +151,13 @@
                                 </div>
                                 <div class = "col-8 my-3" style="display: block;">
                                     <h6 class = "text-light small-heading">Song notes</h6>
-                                    <input class = "form-control" type="file" name = "song-notes" id = "song-notes" accept="image/*, .pdf">
+                                    <input class = "form-control" type="file" name = "song-notes" id = "song-notes" accept=".pdf" required>
                                 </div>
                                 <div>
                                     <!-- ADD TALAM HERE -->
                                 </div>
+                                <center><input class = "col-2 offset-md-4 mt-3 mx-2 btn btn-outline-light btn-lg" type="submit" name="cancel" value = "Discard" id="cancel">
+                                <input class = "col-2 mt-3 mx-2 btn btn-primary btn-lg" type="submit" name="save&exit" value = "Save" id="save-and-exit"></center>
                             </div>
                         </form>
                     </div>
@@ -165,32 +167,123 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="js/scripts.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-        <script src="assets/demo/chart-area-demo.js"></script>
-        <script src="assets/demo/chart-bar-demo.js"></script>
-        <script src="assets/demo/chart-pie-demo.js"></script>
         <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js'></script>
         <script>
+            
             $(document).ready(function(){
+
+                var songName;
+                var notes;
+                var talam;
+                var ragam;
+                var song;
+                var description;
+                var base64Notes;
+
                 $.ajax({
                     type: 'GET',
-                    url: 'http://localhost:8080/ragams',
+                    url: BACKEND_URL + 'ragams',
                     success: function(ragams){
                         $('#ragams').empty;
                         $.each(ragams, function(i, ragam){
-                            $('#ragams').append('<option>' + ragam.name + '</option>');
+                            $('#ragams').append(`<option value=${ragam.id}>${ragam.name}</option>`);
                         })
                     }
                 });
                 $.ajax({
                     type: 'GET',
-                    url: 'http://localhost:8080/talams',
+                    url: BACKEND_URL + 'talams',
                     success: function(talams){
                         $('#talams').empty;
                         $.each(talams, function(i, talam){
-                            $('#talams').append('<option>' + talam.name + '</option>');
+                            $('#talams').append(`<option value=${talam.id}>${talam.name}</option>`);
                         })
                     }
                 });
+
+                $.ajax({
+                        type: `GET`,
+                        url: `${BACKEND_URL}songs`,
+                        success: function(songs){
+                            names = songs.map(song => song.name);
+                        }
+                });
+                
+                $("form").submit(function(event){
+                    event.preventDefault();
+                    songName = $("#song-name").val();
+                    notes = $("#song-notes")[0];
+                    let file = notes.files[0];
+
+                    $.ajax({
+                        type: 'GET',
+                        url: `${BACKEND_URL}ragams/${$('#ragams').val()}`,
+                        async: false,
+                        success: function(obj){
+                            ragam = obj;
+                            console.log("ragam success");
+                        }
+                    })
+
+                    $.ajax({
+                        type: 'GET',
+                        url: `${BACKEND_URL}talams/${$('#talams').val()}`,
+                        async: false,
+                        success: function(obj){
+                            talam = obj;
+                            console.log("talam success");
+                        }
+                    })
+                    
+                    if (names.includes(songName)){
+                        $("#name-error").addClass("hidden");
+                        $("#name-error").removeClass("hidden");
+                    } else {
+                        $("#name-error").addClass("hidden");
+
+                        toBase64(file, function(base64){
+                            base64Notes = base64;
+                            console.log(base64Notes);
+
+                            description = $("#description").val();
+                            console.log(ragam);
+                            console.log(talam);
+
+                            song = {
+                                name: songName,
+                                talamDao: talam,
+                                ragamDao: ragam,
+                                description: description,
+                                talamId: $("#talams").val(),
+                                ragamId: $("#ragams").val(),
+                                notes: base64Notes
+                            }
+        
+                            console.log(song);
+        
+                            $.ajax({
+                                type: "POST",
+                                url: `${BACKEND_URL}songs`,
+                                data: JSON.stringify(song),
+                                contentType: `application/json`,
+                                success: function(){
+                                    console.log("success!");
+                                }
+                            });
+                        })
+                    }
+                });
+
+                function toBase64(file, callback){
+                    let reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = function(){
+                        callback(reader.result);
+                    };
+                    reader.onerror = function(error){
+                        console.error(error);
+                    };
+                }
             });
         </script>
     </body>
